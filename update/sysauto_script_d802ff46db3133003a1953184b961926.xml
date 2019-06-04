@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sysauto_script">
+    <sysauto_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <condition><![CDATA[//Return 'true' to run the job
+var answer = false;
+//Get the day of week. 1=Monday, 7=Sunday
+var now = new GlideDateTime();
+//Run only on weekdays
+if(now.getDayOfWeek() < 6){
+	answer = true;
+}
+answer;]]></condition>
+        <conditional>true</conditional>
+        <name>Rinty send email after every 7 week days</name>
+        <run_as display_value="System Administrator">6816f79cc0a8016401c5a33be04be441</run_as>
+        <run_as_tz/>
+        <run_dayofmonth>1</run_dayofmonth>
+        <run_dayofweek>1</run_dayofweek>
+        <run_period/>
+        <run_start>2019-06-04 13:22:21</run_start>
+        <run_time>1970-01-01 08:01:00</run_time>
+        <run_type>daily</run_type>
+        <script><![CDATA[var gr = new GlideRecord('change_request');
+gr.addEncodedQuery('state=-5^priority=1');
+gr.addQuery('sys_updated_on','<',gs.daysAgoStart(6));
+gr.query();
+while(gr.next())
+	{
+	var count = gr.getValue('u_count');   // counter field created with default value 0
+	if(count % 7 ==0)   // since the email is to be sent after every 7 days
+		{
+		gs.eventQueueScheduled('change_request.inactivity',gr,gs.getUserID(),gs.getUserName());
+		gr.autoSysFields(false);
+		gr.setWorkflow(false);
+		gr.update();
+	}
+	count++;   // counter will be updated each time the job is run which is daily
+	gr.setValue('u_count',count); // capture the value of the updated counter
+	gr.autoSysFields(false);
+	gr.setWorkflow(false);
+	gr.update();
+}]]></script>
+        <sys_class_name>sysauto_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2019-06-04 13:35:31</sys_created_on>
+        <sys_id>d802ff46db3133003a1953184b961926</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_name>Rinty send email after every 7 week days</sys_name>
+        <sys_package display_value="NeedIt" source="x_58872_needit">6ead8e780f603200cd674f8ce1050ed1</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="NeedIt">6ead8e780f603200cd674f8ce1050ed1</sys_scope>
+        <sys_update_name>sysauto_script_d802ff46db3133003a1953184b961926</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2019-06-04 15:06:46</sys_updated_on>
+        <upgrade_safe>false</upgrade_safe>
+    </sysauto_script>
+</record_update>
